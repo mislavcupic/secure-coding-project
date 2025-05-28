@@ -24,7 +24,17 @@ public StudentDTO(){}
         return name;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     public String getEmail() {
         return email;

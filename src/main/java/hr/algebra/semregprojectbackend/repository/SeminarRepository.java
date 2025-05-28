@@ -10,7 +10,8 @@ public interface SeminarRepository extends JpaRepository<Seminar, Long> {
     List<Seminar> findAll();
     Optional<Seminar> findByTopicIgnoreCase(String topic);
 
+    @Override
+    void deleteById(Long id);
 
-
-
+    boolean existsById(Long id);
 }

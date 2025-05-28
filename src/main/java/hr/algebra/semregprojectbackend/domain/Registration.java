@@ -26,5 +26,6 @@ public class Registration {
 
 
     public void setRegisteredAt(@NotNull LocalDateTime registeredAt) {
+        this.registeredAt = registeredAt;
     }
 }

@@ -5,24 +5,24 @@ import hr.algebra.semregprojectbackend.dto.SeminarDTO;
 import jakarta.validation.Valid;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture; // Dodano za asinkrone operacije
+import java.util.Optional; // Sada se koristi direktno, ne u CompletableFuture
 
 public interface SeminarService {
 
-     // Promijenjeno: Vraća CompletableFuture<List<SeminarDTO>>
-     CompletableFuture<List<SeminarDTO>> getAllSeminars();
+     // Vraća direktno List<SeminarDTO>
+     List<SeminarDTO> getAllSeminars();
 
-     // Promijenjeno: Vraća CompletableFuture<Optional<SeminarDTO>>
-     CompletableFuture<Optional<SeminarDTO>> save(@Valid SeminarUpdateCommand seminarUpdateCommand);
+     // Vraća direktno Optional<SeminarDTO>
+     Optional<SeminarDTO> save(@Valid SeminarUpdateCommand seminarUpdateCommand);
 
-     // Promijenjeno: Vraća CompletableFuture<SeminarDTO>
-     CompletableFuture<SeminarDTO> updateSeminar(Long id, SeminarDTO seminar);
+     // Vraća direktno SeminarDTO
+     // Ovdje sam vratio Optional<SeminarDTO> jer je to fleksibilnije za 404 Not Found
+     Optional<SeminarDTO> updateSeminar(Long id, SeminarDTO seminar);
 
-     // Promijenjeno: Vraća CompletableFuture<Void> jer nema povratne vrijednosti
-     CompletableFuture<Void> deleteById(Long id);
+     // Vraća void
+     void deleteById(Long id);
 
-     // Promijenjeno: Vraća CompletableFuture<Optional<SeminarDTO>>
-     CompletableFuture<Optional<SeminarDTO>> findSeminarByTopic(String topic);
+     // Vraća direktno Optional<SeminarDTO>
+     Optional<SeminarDTO> findSeminarByTopic(String topic);
 
 }

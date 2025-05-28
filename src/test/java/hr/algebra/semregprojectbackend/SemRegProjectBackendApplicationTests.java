@@ -8,6 +8,7 @@ class SemRegProjectBackendApplicationTests {
 
 	@Test
 	void contextLoads() {
+		//maybe there will be a test some day :)
 	}
 
 }

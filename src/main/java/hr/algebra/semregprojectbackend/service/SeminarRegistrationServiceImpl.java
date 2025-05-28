@@ -15,21 +15,23 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class SeminarRegistrationServiceImpl implements SeminarRegistrationService {
-
+    Collector<RegistrationDTO, ?, List<RegistrationDTO>> collector = Collectors.toList();
     private final RegistrationRepository registrationRepository;
     private final StudentRepository studentRepository;
     private final SeminarRepository seminarRepository;
 
     @Override
     public List<RegistrationDTO> getAllRegistrations() {
+
         return registrationRepository.findAllWithStudentsAndSeminars().stream()
                 .map(this::mapToDto)
-                .collect(Collectors.toList());
+                .collect(collector);
     }
 
     @Override
@@ -37,7 +39,7 @@ public class SeminarRegistrationServiceImpl implements SeminarRegistrationServic
         return registrationRepository.findAllBySeminar_Topic(topic)
                 .map(registrations -> registrations.stream()
                         .map(this::mapToDto)
-                        .collect(Collectors.toList()));
+                        .collect(collector));
     }
 
     @Override
@@ -45,7 +47,7 @@ public class SeminarRegistrationServiceImpl implements SeminarRegistrationServic
         return registrationRepository.findAllByStudent_EmailWithStudents(email) // Promijenjeno ime metode
                 .map(registrations -> registrations.stream()
                         .map(this::mapToDto)
-                        .collect(Collectors.toList()));
+                        .collect(collector));
     }
 
     @Override
@@ -91,7 +93,7 @@ public class SeminarRegistrationServiceImpl implements SeminarRegistrationServic
     public Optional<List<RegistrationDTO>> getRegistrationsBySeminarId(Long seminarId) {
         return registrationRepository.findAllBySeminar_IdWithStudents(seminarId)
                 .map(registrations -> registrations.stream()
-                        .map(this::mapToDto).collect(Collectors.toList()));
+                        .map(this::mapToDto).collect(collector));
     }
 
     private RegistrationDTO mapToDto(Registration reg) {

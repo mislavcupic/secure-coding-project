@@ -1,6 +1,5 @@
 package hr.algebra.semregprojectbackend.service;
 
-import hr.algebra.semregprojectbackend.command.RegistrationCreateCommand;
 import hr.algebra.semregprojectbackend.command.RegistrationUpdateCommand;
 import hr.algebra.semregprojectbackend.dto.RegistrationDTO;
 

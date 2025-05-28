@@ -1,6 +1,6 @@
 package hr.algebra.semregprojectbackend.controller;
 
-import hr.algebra.semregprojectbackend.command.StudentCreateCommand;
+
 import hr.algebra.semregprojectbackend.command.StudentUpdateCommand;
 import hr.algebra.semregprojectbackend.dto.StudentDTO;
 import hr.algebra.semregprojectbackend.service.StudentService;
@@ -26,6 +26,7 @@ public class StudentController {
     public ResponseEntity<List<StudentDTO>> getAllStudents() {
         return ResponseEntity.ok(studentService.getAllStudents());
     }
+
 
 
     @GetMapping(params = "email")

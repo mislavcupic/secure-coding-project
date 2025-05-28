@@ -1,7 +1,6 @@
 package hr.algebra.semregprojectbackend.dto;
 
-import hr.algebra.semregprojectbackend.domain.Seminar;
-import jakarta.validation.constraints.NotBlank;
+import hr.algebra.semregprojectbackend.domain.Seminar; // Uvoz entiteta - Oprez!
 
 public class SeminarDTO {
     private Long id;
@@ -11,16 +10,23 @@ public class SeminarDTO {
     public SeminarDTO() {
         // Default constructor needed for Jackson
     }
-public SeminarDTO(Seminar seminar) {
-    this.id = seminar.getId();
-    this.topic = seminar.getTopic();
-    this.lecturer = seminar.getLecturer();
-}
+
+
+    public SeminarDTO(Seminar seminar) {
+        this.id = seminar.getId();
+        this.topic = seminar.getTopic();
+        this.lecturer = seminar.getLecturer();
+    }
+
 
 
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTopic() {
