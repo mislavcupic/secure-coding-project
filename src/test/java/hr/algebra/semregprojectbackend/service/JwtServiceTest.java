@@ -1,5 +1,6 @@
 package hr.algebra.semregprojectbackend.service;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -55,28 +56,24 @@ class JwtServiceTest {
     }
 
     @Test
-    void testTokenExpiration()  {
-        String username = "userExp";
-        Date expirationDate = new Date(System.currentTimeMillis() + 1500); // 1.5 sekundi od sad
-        String token = jwtService.generateTokenWithExpiration(username, expirationDate);
+    void testTokenIsExpiredImmediately() {
+        String username = "expiredUser";
+
+        // Datum isteka je 1 minuta u prošlosti
+        Date expiredDate = new Date(System.currentTimeMillis() - 60_000);
+        String token = jwtService.generateTokenWithExpiration(username, expiredDate);
 
         UserDetails userDetails = Mockito.mock(UserDetails.class);
         Mockito.when(userDetails.getUsername()).thenReturn(username);
 
-        // Token bi trebao biti validan odmah nakon generiranja
-        assertTrue(jwtService.validateToken(token, userDetails));
-
-
-
-        // Očekujemo da validateToken ne uspije i da se ne baca izuzetak, nego vrati false
-        // Ako jwt biblioteka baci izuzetak, možemo ga hvatati i interpretirati kao false validaciju
-        boolean valid;
+        boolean isValid;
         try {
-            valid = jwtService.validateToken(token, userDetails);
-        } catch (io.jsonwebtoken.ExpiredJwtException ex) {
-            valid = false;
+            isValid = jwtService.validateToken(token, userDetails);
+        } catch (ExpiredJwtException e) {
+            isValid = false;
         }
-        assertFalse(valid);
+
+        assertFalse(isValid);
     }
 
     @Test
