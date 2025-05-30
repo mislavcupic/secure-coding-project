@@ -55,6 +55,7 @@ public class JwtService {
     }
 
     public String generateToken(String username) {
+        System.out.println("Generating token for user: " + username);
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, username);
     }
@@ -70,7 +71,7 @@ public class JwtService {
     }
 
     private SecretKey getSignKey() {
-        byte[] keyBytes = Decoders.BASE64URL.decode(secret);
+        byte[] keyBytes = Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 

@@ -13,7 +13,7 @@ public class JwtKeyGenerator {
         byte[] keyBytes = Keys.secretKeyFor(SignatureAlgorithm.HS256).getEncoded();
         // Kodira ga u Base64 format
         String base64Key = Encoders.BASE64.encode(keyBytes);
-        logger.log(Level.parse(base64Key),"Your new secure Base64 JWT Secret:");
+        logger.log(Level.INFO, "Your new secure Base64 JWT Secret: {0}", base64Key);
 
     }
 }

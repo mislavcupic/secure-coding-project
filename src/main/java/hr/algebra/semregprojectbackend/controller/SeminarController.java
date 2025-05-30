@@ -7,6 +7,7 @@ import hr.algebra.semregprojectbackend.service.SeminarService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -47,7 +48,7 @@ public class SeminarController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<SeminarDTO> createSeminar(@RequestBody @Valid SeminarUpdateCommand seminarUpdateCommand) {
         try {
@@ -62,7 +63,7 @@ public class SeminarController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<SeminarDTO> updateSeminar(@PathVariable Long id, @RequestBody SeminarDTO seminarDTO) {
         try {
@@ -75,7 +76,7 @@ public class SeminarController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT) // Ovo je i dalje valjana anotacija za sinkrone metode
     public void deleteSeminar(@PathVariable Long id) {

@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -36,7 +37,7 @@ class UserDetailsServiceImplTest {
         role.setName("USER");
         userInfo.setRoles(List.of(role));
 
-        when(userRepository.findByUsername("testuser")).thenReturn(userInfo);
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(userInfo));
 
         UserDetails userDetails = userDetailsService.loadUserByUsername("testuser");
 
@@ -45,9 +46,10 @@ class UserDetailsServiceImplTest {
         assertThat(userDetails.getAuthorities()).isNotEmpty();
     }
 
+
     @Test
     void loadUserByUsername_throwsWhenUserNotFound() {
-        when(userRepository.findByUsername("nouser")).thenReturn(null);
+        when(userRepository.findByUsername("nouser")).thenReturn(Optional.empty());
 
         assertThrows(UsernameNotFoundException.class, () -> {
             userDetailsService.loadUserByUsername("nouser");

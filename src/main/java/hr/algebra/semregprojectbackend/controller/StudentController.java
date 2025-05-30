@@ -7,6 +7,7 @@ import hr.algebra.semregprojectbackend.service.StudentService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,20 +36,20 @@ public class StudentController {
         return foundStudent.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<StudentDTO> createStudent(@RequestBody @Valid StudentUpdateCommand studentUpdateCommand) {
         Optional<StudentDTO> savedStudent = studentService.save(studentUpdateCommand);
         return savedStudent.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.badRequest().build());
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<Optional<StudentDTO>> updateStudent(@PathVariable Long id, @RequestBody StudentUpdateCommand studentUpdateCommand) {
         Optional<StudentDTO> updatedStudent = studentService.updateStudent(id,studentUpdateCommand);
         return ResponseEntity.ok(updatedStudent);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteStudent(@PathVariable Long id) {

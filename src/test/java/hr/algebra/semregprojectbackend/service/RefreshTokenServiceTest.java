@@ -33,7 +33,7 @@ class RefreshTokenServiceTest {
         UserInfo user = new UserInfo();
         user.setUsername("testuser");
 
-        Mockito.when(userRepository.findByUsername("testuser")).thenReturn(user);
+        Mockito.when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
 
         RefreshToken token = RefreshToken.builder()
                 .userInfo(user)
@@ -48,7 +48,6 @@ class RefreshTokenServiceTest {
         assertThat(created).isNotNull();
         assertThat(created.getUserInfo().getUsername()).isEqualTo("testuser");
     }
-
     @Test
     void findByToken_returnsOptionalToken() {
         RefreshToken token = new RefreshToken();

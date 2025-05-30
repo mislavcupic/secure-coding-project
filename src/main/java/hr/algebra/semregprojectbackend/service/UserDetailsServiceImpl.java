@@ -27,16 +27,12 @@ private final UserRepository repository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserInfo user = this.repository.findByUsername(username);
-
-        if (user == null) {
-            throw new UsernameNotFoundException("Unknown user " + username);
-        }
+        UserInfo user = this.repository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Unknown user " + username));
 
         List<UserRole> userRoleList = user.getRoles();
 
         String[] roles = new String[userRoleList.size()];
-
         for (int i = 0; i < userRoleList.size(); i++) {
             roles[i] = userRoleList.get(i).getName();
         }

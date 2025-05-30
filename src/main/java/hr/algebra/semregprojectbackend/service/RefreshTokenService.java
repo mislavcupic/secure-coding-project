@@ -2,6 +2,7 @@ package hr.algebra.semregprojectbackend.service;
 
 
 import hr.algebra.semregprojectbackend.domain.RefreshToken;
+import hr.algebra.semregprojectbackend.domain.UserInfo;
 import hr.algebra.semregprojectbackend.exception.TokenExpiredException;
 import hr.algebra.semregprojectbackend.repository.RefreshTokenRepository;
 import hr.algebra.semregprojectbackend.repository.UserRepository;
@@ -26,11 +27,15 @@ public class RefreshTokenService {
     }
 
     public RefreshToken createRefreshToken(String username){
+        UserInfo userInfo = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+
         RefreshToken refreshToken = RefreshToken.builder()
-                .userInfo(userRepository.findByUsername(username))
+                .userInfo(userInfo)
                 .token(UUID.randomUUID().toString())
-                .expiryDate(Instant.now().plusMillis(600000)) // set expiry of refresh token to 10 minutes - you can configure it application.properties file
+                .expiryDate(Instant.now().plusMillis(600000)) // 10 minuta
                 .build();
+
         return refreshTokenRepository.save(refreshToken);
     }
 
