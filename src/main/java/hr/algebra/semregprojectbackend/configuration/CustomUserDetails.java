@@ -4,13 +4,12 @@ import hr.algebra.semregprojectbackend.domain.UserInfo;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import java.util.Collection;
-import java.util.stream.Collectors;
+
 
 public class CustomUserDetails implements UserDetails {
 
-    private final UserInfo userInfo;
+    private final transient UserInfo userInfo;
 
     public CustomUserDetails(UserInfo userInfo) {
         this.userInfo = userInfo;
@@ -20,7 +19,7 @@ public class CustomUserDetails implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return userInfo.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override

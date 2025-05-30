@@ -6,6 +6,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -16,8 +18,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+
+
 @Component
 public class JwtService {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Value("${jwt.secret}")
     @Setter // samo setter da možeš postaviti u testu ako treba
@@ -55,7 +61,7 @@ public class JwtService {
     }
 
     public String generateToken(String username) {
-        System.out.println("Generating token for user: " + username);
+        logger.debug("Generating token for user: {}", username);
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, username);
     }
