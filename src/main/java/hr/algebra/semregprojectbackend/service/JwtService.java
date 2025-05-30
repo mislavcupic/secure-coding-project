@@ -3,13 +3,14 @@ package hr.algebra.semregprojectbackend.service;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders; // Ovo je iz novijih verzija
-import io.jsonwebtoken.security.Keys; // Ovo je iz novijih verzija
-import org.springframework.beans.factory.annotation.Value; // Dodano za eksternalizaciju tajnog ključa
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +20,7 @@ import java.util.function.Function;
 public class JwtService {
 
     @Value("${jwt.secret}")
+    @Setter // samo setter da možeš postaviti u testu ako treba
     private String secret;
 
     public String extractUsername(String token) {
@@ -35,9 +37,8 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        // PROMJENA JE OVDJE: Koristi parserBuilder() umjesto parser()
         return Jwts
-                .parserBuilder() // <-- Promijenjeno iz .parser()
+                .parserBuilder()
                 .setSigningKey(getSignKey())
                 .build()
                 .parseClaimsJws(token)
@@ -53,27 +54,38 @@ public class JwtService {
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-    public String generateToken(String username){
+    public String generateToken(String username) {
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, username);
     }
 
     private String createToken(Map<String, Object> claims, String username) {
-        // Vaš expiration time (1000*6000*1) je vrlo dug (100 sati). Ako je namjerno, ok.
-        // Ako ne, razmislite o kraćem. Npr. 1000L * 60 * 60 * 24 za 24 sata.
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 100)) // Primjer za 100 sati
-                .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
+                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 100)) // 100 sati
+                .signWith(getSignKey(), SignatureAlgorithm.HS256)
+                .compact();
     }
 
-    private Key getSignKey() {
-        // PAŽNJA: Ovisno o formatu vašeg SECRET ključa, Decoders.BASE64.decode() možda nije ispravno.
-        // Ako je ključ heksadecimalni string, trebat će vam Apache Commons Codec Hex.decodeHex().
-        // Za sada pretpostavljam da je Base64 ili da to radi (ako su ranije verzije jjwt to tolerirale).
-        byte[] keyBytes = Decoders.BASE64.decode(secret);
+    private SecretKey getSignKey() {
+        byte[] keyBytes = Decoders.BASE64URL.decode(secret);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public String generateTokenWithExpiration(String username, Date expirationDate) {
+        Map<String, Object> claims = new HashMap<>();
+        return createTokenWithExpiration(claims, username, expirationDate);
+    }
+
+    private String createTokenWithExpiration(Map<String, Object> claims, String username, Date expirationDate) {
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(username)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(expirationDate)
+                .signWith(getSignKey(), SignatureAlgorithm.HS256)
+                .compact();
     }
 }

@@ -2,7 +2,7 @@ package hr.algebra.semregprojectbackend.configuration;
 
 import hr.algebra.semregprojectbackend.filter.JwtAuthFilter;
 import hr.algebra.semregprojectbackend.service.UserDetailsServiceImpl;
-import hr.algebra.semregprojectbackend.repository.UserRepository; // <-- DODAJ OVO!
+import hr.algebra.semregprojectbackend.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +13,6 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -26,13 +25,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfiguration {
 
     private JwtAuthFilter jwtAuthFilter;
-    private UserRepository userRepository; // <-- DODAJ OVO! Spring će ovo injektirati u SecurityConfiguration
+    private UserRepository userRepository;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(AbstractHttpConfigurer::disable)
-                .csrf(AbstractHttpConfigurer::disable)
+
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // Dozvoli OPTIONS pre-flight zahtjeve za sve putanje
@@ -70,6 +68,8 @@ public class SecurityConfiguration {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService(userDetailsService());
         authenticationProvider.setPasswordEncoder(passwordEncoder());
+        // DODAJ OVO ZA SPRJEČAVANJE USER ENUMERACIJE:
+        authenticationProvider.setHideUserNotFoundExceptions(true); // <-- Ovdje je promjena!
         return authenticationProvider;
     }
 
@@ -77,7 +77,6 @@ public class SecurityConfiguration {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-
 
     @Bean
     public UserDetailsService userDetailsService() {

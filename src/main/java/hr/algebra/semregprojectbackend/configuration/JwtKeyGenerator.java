@@ -3,7 +3,6 @@ package hr.algebra.semregprojectbackend.configuration;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

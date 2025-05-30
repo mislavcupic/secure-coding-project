@@ -23,6 +23,10 @@ public class SeminarUpdateCommand {
         this.lecturer = lecturer;
     }
 
+    public SeminarUpdateCommand() {
+
+    }
+
     @Primary
 
     public Long getId() {

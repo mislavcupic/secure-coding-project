@@ -1,6 +1,5 @@
 package hr.algebra.semregprojectbackend.controller;
 
-
 import hr.algebra.semregprojectbackend.domain.RefreshToken;
 import hr.algebra.semregprojectbackend.dto.AuthRequestDTO;
 import hr.algebra.semregprojectbackend.dto.JwtResponseDTO;
@@ -12,8 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.AuthenticationException; // <-- DODAJ OVO!
+import org.springframework.security.authentication.BadCredentialsException; // <-- DODAJ OVO! (opcionalno, ali dobra praksa)
 import org.springframework.web.bind.annotation.*;
 
 
@@ -29,22 +28,32 @@ public class AuthController {
 
     private RefreshTokenService refreshTokenService;
 
-
-
-
     @PostMapping("/api/v1/login")
-    public JwtResponseDTO authenticateAndGetToken(@RequestBody AuthRequestDTO authRequestDTO){
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequestDTO.getUsername(), authRequestDTO.getPassword()));
-        if(authentication.isAuthenticated()){
-            RefreshToken refreshToken = refreshTokenService.createRefreshToken(authRequestDTO.getUsername());
-            return JwtResponseDTO.builder()
-                    .accessToken(jwtService.generateToken(authRequestDTO.getUsername()))
-                    .token(refreshToken.getToken())
-                    .build();
-        } else {
-            throw new UsernameNotFoundException("invalid user request..!!");
+    public JwtResponseDTO authenticateAndGetToken(@RequestBody AuthRequestDTO authRequestDTO) {
+        if (authRequestDTO.getUsername() == null || authRequestDTO.getPassword() == null) {
+            throw new IllegalArgumentException("Username and password must be provided");
         }
+
+        try {
+            // Pokušaj autentifikacije. Ako ne uspije, AuthenticationManager će baciti iznimku
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(authRequestDTO.getUsername(), authRequestDTO.getPassword())
+            );
+        } catch (AuthenticationException e) {
+            // Logiraj upozorenje i baci generičku BadCredentialsException
+            logger.warn("Authentication failed for user {}: {}", authRequestDTO.getUsername(), e.getMessage());
+            throw new BadCredentialsException("Invalid username or password");
+        }
+
+        // Ako je autentifikacija uspjela, generiraj tokene
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(authRequestDTO.getUsername());
+
+        return JwtResponseDTO.builder()
+                .accessToken(jwtService.generateToken(authRequestDTO.getUsername()))
+                .token(refreshToken.getToken())
+                .build();
     }
+
 
     @PostMapping("/api/v1/refreshToken")
     public JwtResponseDTO refreshToken(@RequestBody RefreshTokenRequestDTO refreshTokenRequestDTO){
@@ -63,7 +72,4 @@ public class AuthController {
     public void logout() {
         logger.info("logout called...");
     }
-
-
-
 }

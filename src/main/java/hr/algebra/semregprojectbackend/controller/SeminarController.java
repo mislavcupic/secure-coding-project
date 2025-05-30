@@ -35,7 +35,7 @@ public class SeminarController {
         }
     }
 
-    @GetMapping("/search")
+    @GetMapping(params = "topic")
     public ResponseEntity<SeminarDTO> findByTopicName(@RequestParam String topic) {
         try {
 

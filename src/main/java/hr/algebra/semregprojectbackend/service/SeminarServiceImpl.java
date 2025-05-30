@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-
 @Service
 public class SeminarServiceImpl implements SeminarService {
     private final SeminarRepository seminarRepo;
@@ -20,40 +19,39 @@ public class SeminarServiceImpl implements SeminarService {
 
     @Override
     public Optional<SeminarDTO> findSeminarByTopic(String topic) {
-
         Optional<Seminar> seminarOptional = seminarRepo.findByTopicIgnoreCase(topic);
-        return seminarOptional.map(SeminarDTO::new);
+        // Ovdje koristiš konstruktor s entitetom — ako ti pada zbog konstruktora, prebaci i ovdje na mapToDto
+        return seminarOptional.map(this::mapToDto);
     }
 
     @Override
     public List<SeminarDTO> getAllSeminars() {
-        return seminarRepo.findAll().stream().map(SeminarDTO::new).toList();
+        // Streaming i mapiranje entiteta u DTO
+        return seminarRepo.findAll().stream()
+                .map(this::mapToDto)
+                .toList();
     }
-
 
     @Override
     public Optional<SeminarDTO> save(SeminarUpdateCommand seminarUpdateCommand) {
-
         Seminar seminar = new Seminar();
         seminar.setTopic(seminarUpdateCommand.getTopic());
         seminar.setLecturer(seminarUpdateCommand.getLecturer());
 
         Seminar savedSeminar = seminarRepo.save(seminar);
-        return Optional.of(new SeminarDTO(savedSeminar));
+        return Optional.of(mapToDto(savedSeminar));
     }
-
 
     @Override
     public Optional<SeminarDTO> updateSeminar(Long id, SeminarDTO seminarDTO) {
         return seminarRepo.findById(id)
                 .map(seminar -> {
-                    seminar.setTopic(seminarDTO.getTopic()); //  Nema sanitizacije
+                    seminar.setTopic(seminarDTO.getTopic()); // Ovde možeš dodati sanitizaciju ako želiš
                     seminar.setLecturer(seminarDTO.getLecturer());
                     Seminar updated = seminarRepo.save(seminar);
-                    return new SeminarDTO(updated);
+                    return mapToDto(updated);
                 });
     }
-
 
     @Override
     public void deleteById(Long id) {
@@ -61,5 +59,13 @@ public class SeminarServiceImpl implements SeminarService {
             throw new SeminarNotFoundException(id);
         }
         seminarRepo.deleteById(id);
+    }
+
+    private SeminarDTO mapToDto(Seminar seminar) {
+        return new SeminarDTO(
+                seminar.getId(),
+                seminar.getTopic(),
+                seminar.getLecturer()
+        );
     }
 }
