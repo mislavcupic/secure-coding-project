@@ -7,14 +7,17 @@ import hr.algebra.semregprojectbackend.exception.SeminarNotFoundException;
 import hr.algebra.semregprojectbackend.repository.SeminarRepository;
 import org.springframework.stereotype.Service;
 
+
 import java.util.List;
 import java.util.Optional;
 @Service
 public class SeminarServiceImpl implements SeminarService {
     private final SeminarRepository seminarRepo;
 
+
     public SeminarServiceImpl(SeminarRepository seminarRepo) {
         this.seminarRepo = seminarRepo;
+
     }
 
     @Override
@@ -68,4 +71,6 @@ public class SeminarServiceImpl implements SeminarService {
                 seminar.getLecturer()
         );
     }
+
+
 }

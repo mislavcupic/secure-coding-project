@@ -83,5 +83,7 @@ public class SeminarController {
 
         seminarService.deleteById(id);
     }
+
+
 }
 
